@@ -15,4 +15,4 @@
     along with PM4Py.  If not, see <https://www.gnu.org/licenses/>.
 '''
 
-from pm4py.algo.anonymization.pripel import algorithm, variants
+from pm4py.algo.anonymization.pripel.variants import pripel
