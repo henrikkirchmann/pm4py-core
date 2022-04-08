@@ -1,20 +1,16 @@
 import datetime
-import sys
-import diffprivlib.mechanisms as privacyMechanisms
 import random
+import sys
 from collections import deque
 from datetime import timedelta
 
-from pm4py.objects.log.exporter.xes import exporter as xes_exporter
-from pm4py.objects.log.importer.xes import importer as xes_import_factory
-from pm4py.objects.log.obj import EventLog
-from pm4py.objects.log import log as event_log
+import diffprivlib.mechanisms as privacyMechanisms
 import numpy as np
 from dateutil.tz import tzutc
 from scipy.optimize import linear_sum_assignment
 
-
-
+from pm4py.objects.log import log as event_log
+from pm4py.objects.log.obj import EventLog
 
 TRACE_START = "TRACE_START"
 TRACE_END = "TRACE_END"
@@ -153,8 +149,8 @@ def generate_pm4py_log(trace_frequencies):
             log.append(trace)
     return log
 
-def apply_pripel(log, epsilon, N, k, blacklist=None):
 
+def apply_pripel(log, epsilon, N, k, blacklist=None):
     def freq(lst):
         d = {}
         for i in lst:
@@ -191,7 +187,8 @@ def apply_pripel(log, epsilon, N, k, blacklist=None):
     starttime_attribute_anonymizer = datetime.datetime.now()
     attributeAnonymizer = AttributeAnonymizer(blacklist)
     anonymizedLog, attributeDistribution = attributeAnonymizer.anonymize(matchedLog, distributionOfAttributes, epsilon,
-                                                                         occurredTimestampDifferences, occurredTimestamps)
+                                                                         occurredTimestampDifferences,
+                                                                         occurredTimestamps)
     endtime_attribute_anonymizer = datetime.datetime.now()
     print("Time of attribute anonymizer: " + str(endtime_attribute_anonymizer - starttime_attribute_anonymizer))
     endtime = datetime.datetime.now()
@@ -228,6 +225,7 @@ def apply(log: EventLog, epsilon: float, n: int, k: int, blacklist: set = None):
     """
 
     return apply_pripel(log, epsilon, n, k, blacklist=None)
+
 
 class TraceMatcher:
     def __init__(self, tv_query_log, log, blacklist):
@@ -486,6 +484,7 @@ class TraceMatcher:
 
     def getTimeStampData(self):
         return self.__allTimestamps, self.__allTimeStampDifferences
+
 
 # This algorithm was copied at 16/Nov/2018 from https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python and applied to activity sequences
 delimter = "@"
