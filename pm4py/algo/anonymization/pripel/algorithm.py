@@ -33,7 +33,7 @@ DEFAULT_VARIANT = Variants.PRIPEL
 VERSIONS = {Variants.PRIPEL}
 
 
-def apply(log: Union[EventLog, pd.DataFrame], epsilon: float, n: int, k: int, blackList: set = None, variant=DEFAULT_VARIANT):
+def apply(log: Union[EventLog, pd.DataFrame], epsilon: float, n: int, k: int, blacklist: set = None, variant=DEFAULT_VARIANT):
     """
     PRIPEL (Privacy-preserving event log publishing with contextual information) is a framework to publish event logs that fulfill differential privacy.
 
@@ -57,4 +57,4 @@ def apply(log: Union[EventLog, pd.DataFrame], epsilon: float, n: int, k: int, bl
         Anonymised event log
     """
     log = log_converter.apply(log, variant=log_converter.Variants.TO_EVENT_LOG)
-    return exec_utils.get_variant(variant).apply(log, epsilon, n, k, blackList = None)
+    return exec_utils.get_variant(variant).apply(log, epsilon, n, k, blacklist = None)

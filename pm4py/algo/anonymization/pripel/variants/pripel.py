@@ -153,7 +153,7 @@ def generate_pm4py_log(trace_frequencies):
             log.append(trace)
     return log
 
-def apply_pripel(log, epsilon, N, k, blackList=None):
+def apply_pripel(log, epsilon, N, k, blacklist=None):
 
     def freq(lst):
         d = {}
@@ -178,7 +178,7 @@ def apply_pripel(log, epsilon, N, k, blackList=None):
     print("Time of TV Query: " + str((endtime_tv_query - starttime_tv_query)))
     starttime_trace_matcher = datetime.datetime.now()
 
-    traceMatcher = TraceMatcher(tv_query_log, log)
+    traceMatcher = TraceMatcher(tv_query_log, log, blacklist)
     matchedLog = traceMatcher.matchQueryToLog()
 
     print(len(matchedLog))
@@ -189,7 +189,7 @@ def apply_pripel(log, epsilon, N, k, blackList=None):
     occurredTimestamps, occurredTimestampDifferences = traceMatcher.getTimeStampData()
     print(min(occurredTimestamps))
     starttime_attribute_anonymizer = datetime.datetime.now()
-    attributeAnonymizer = AttributeAnonymizer()
+    attributeAnonymizer = AttributeAnonymizer(blacklist)
     anonymizedLog, attributeDistribution = attributeAnonymizer.anonymize(matchedLog, distributionOfAttributes, epsilon,
                                                                          occurredTimestampDifferences, occurredTimestamps)
     endtime_attribute_anonymizer = datetime.datetime.now()
@@ -203,7 +203,7 @@ def apply_pripel(log, epsilon, N, k, blackList=None):
     return anonymizedLog
 
 
-def apply(log: EventLog, epsilon: float, n: int, k: int, blackList: set = None):
+def apply(log: EventLog, epsilon: float, n: int, k: int, blacklist: set = None):
     """
     PRIPEL (Privacy-preserving event log publishing with contextual information) is a framework to publish event logs that fulfill differential privacy.
 
@@ -227,17 +227,17 @@ def apply(log: EventLog, epsilon: float, n: int, k: int, blackList: set = None):
         Anonymised event log
     """
 
-    return apply_pripel(log, epsilon, n, k, blackList=None)
+    return apply_pripel(log, epsilon, n, k, blacklist=None)
 
 class TraceMatcher:
-    def __init__(self, tv_query_log, log):
+    def __init__(self, tv_query_log, log, blacklist):
         self.__timestamp = "time:timestamp"
         self.__allTimestamps = list()
         self.__allTimeStampDifferences = list()
         self.__distanceMatrix = dict()
         self.__trace_variants_query = self.__addTraceToAttribute(tv_query_log)
         self.__trace_variants_log = self.__addTraceToAttribute(log)
-        attributeBlacklist = self.__getBlacklistOfAttributes()
+        attributeBlacklist = self.__getBlacklistOfAttributes(blacklist)
         self.__distributionOfAttributes, self.__eventStructure = self.__getDistributionOfAttributesAndEventStructure(
             log, attributeBlacklist)
         self.__query_log = tv_query_log
@@ -255,8 +255,9 @@ class TraceMatcher:
             trace_variants[variant] = traceSet
         return trace_variants
 
-    def __getBlacklistOfAttributes(self):
-        blacklist = set()
+    def __getBlacklistOfAttributes(self, blacklist):
+        if blacklist is None:
+            blacklist = set()
         blacklist.add("concept:name")
         blacklist.add(self.__timestamp)
         blacklist.add("variant")
@@ -522,16 +523,17 @@ def levenshtein(s1, s2):
 
 class AttributeAnonymizer:
 
-    def __init__(self):
+    def __init__(self, blacklist):
         self.__timestamp = "time:timestamp"
-        self.__blacklist = self.__getBlacklistOfAttributes()
+        self.__blacklist = self.__getBlacklistOfAttributes(blacklist)
         self.__sensitivity = "sensitivity"
         self.__max = "max"
         self.__min = "min"
         self.__infectionSuspected = list()
 
-    def __getBlacklistOfAttributes(self):
-        blacklist = set()
+    def __getBlacklistOfAttributes(self, blacklist):
+        if blacklist is None:
+            blacklist = set()
         blacklist.add("concept:name")
         blacklist.add(self.__timestamp)
         blacklist.add("variant")
