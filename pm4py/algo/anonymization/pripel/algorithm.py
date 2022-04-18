@@ -35,7 +35,8 @@ VERSIONS = {Variants.PRIPEL}
 
 def apply(log: Union[EventLog, pd.DataFrame], epsilon: float, n: int, k: int, blacklist: set = None, variant=DEFAULT_VARIANT):
     """
-    PRIPEL (Privacy-preserving event log publishing with contextual information) is a framework to publish event logs that fulfill differential privacy.
+    PRIPEL (Privacy-preserving event log publishing with contextual information) is a framework to publish event logs
+    that fulfill differential privacy.
 
     Parameters
     -------------
@@ -46,7 +47,11 @@ def apply(log: Union[EventLog, pd.DataFrame], epsilon: float, n: int, k: int, bl
     n
         Maximum prefix of considered traces for the trace-variant-query
     k
-        Pruning parameter of the trace-variant-query. At least k traces must appear in a noisy variant count to be part of the result of the query
+        Pruning parameter of the trace-variant-query. At least k traces must appear in a noisy variant count to be part
+        of the result of the query
+    blacklist
+        Some event logs contain attributes that are equivalent to a case id. For privacy reasons such attributes must be
+        deleted from the anonymised log. We handle such attributes with this set
     variant
         Variant of the algorithm to use:
         - Variants.PRIPEL
@@ -57,4 +62,4 @@ def apply(log: Union[EventLog, pd.DataFrame], epsilon: float, n: int, k: int, bl
         Anonymised event log
     """
     log = log_converter.apply(log, variant=log_converter.Variants.TO_EVENT_LOG)
-    return exec_utils.get_variant(variant).apply(log, epsilon, n, k, blacklist = None)
+    return exec_utils.get_variant(variant).apply(log, epsilon, n, k, blacklist)
